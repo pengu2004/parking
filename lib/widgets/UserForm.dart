@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:parking/database.dart';
 import 'package:parking/main.dart';
+import 'package:parking/widgets/bookingConfirm.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../config/shared_prefs.dart';
+import '../config/parking_repository.dart';
 
 class UserForm extends StatefulWidget {
   const UserForm({Key? key}) : super(key: key);
@@ -10,6 +14,43 @@ class UserForm extends StatefulWidget {
 }
 
 class _UserFormState extends State<UserForm> {
+  Future<void> _checkSavedUser() async {
+    final String? savedName = await UserData.getUserName();
+    final String? savedVehicle = await UserData.getVehicleType();
+    final ParkingRepository _parkingRepository = ParkingRepository();
+    final int? userSlot = await _parkingRepository.hasUserBookedToday(
+      name: savedName ?? '',
+    );
+    print("Saved name: $savedName, vehicle: $savedVehicle");
+    setState(() {
+      _nameController.text = savedName ?? '';
+      _selectedVehicle = savedVehicle;
+    });
+    if (!mounted) return;
+    if (userSlot != null && savedVehicle != null && savedName != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BookingConfirmationPage(
+            slotNumber: userSlot,
+            vehicleType: savedVehicle,
+            userName: savedName,
+          ),
+        ),
+      );
+      return;
+    }
+    if (savedName != null && savedVehicle != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              MyBookPage(selectedVehicle: savedVehicle, userName: savedName),
+        ),
+      );
+    }
+  }
+
   final TextEditingController _nameController = TextEditingController();
   final List<String> _vehicleTypes = ['Car', 'Bike'];
   String? _selectedVehicle;
@@ -18,6 +59,7 @@ class _UserFormState extends State<UserForm> {
   void initState() {
     super.initState();
     _selectedVehicle = _vehicleTypes[0];
+    _checkSavedUser();
   }
 
   @override
@@ -68,14 +110,26 @@ class _UserFormState extends State<UserForm> {
               // Or set minimum size to allow growth but ensure a base size
               // minimumSize: const Size(100, 40),
             ),
-            onPressed: () {
-
+            onPressed: () async {
               print("clicked");
+              final name = _nameController.text.trim();
+
+              if (name.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter your name')),
+                );
+                return;
+              }
+
+              await UserData.saveUserData(name, _selectedVehicle!);
+              print("Saved to prefs");
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => MyBookPage(
                     selectedVehicle: _selectedVehicle!,
+                    userName: _nameController.text,
                   ),
                 ),
               );

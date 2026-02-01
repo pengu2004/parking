@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:parking/config/parking_repository.dart';
+import 'bookingConfirm.dart';
 
 class ParkingFloor extends StatefulWidget {
   final String floorName;
   final String vehicleType;
   final Map<int, bool> parkingState;
+  final String userName;
 
   const ParkingFloor({
     super.key,
     required this.floorName,
     required this.vehicleType,
     required this.parkingState,
+    required this.userName,
   });
 
   @override
@@ -18,14 +22,46 @@ class ParkingFloor extends StatefulWidget {
 
 class _ParkingFloorState extends State<ParkingFloor> {
   late Map<int, bool> spots;
+  final ParkingRepository _parkingRepository = ParkingRepository();
   @override
   void initState() {
     super.initState();
     spots = Map.from(widget.parkingState);
   }
 
-  void bookSpot(int spot) {
-    setState( () {spots[spot] = false;}); //mark it as booked
+  void bookSpot(int spot) async {
+    try {
+      await _parkingRepository.saveUser(
+        name: widget.userName,
+        vehicleType: widget.vehicleType,
+        slotNumber: spot,
+      );
+      await _parkingRepository.getOccupiedSpotsToday();
+      setState(() {
+        spots[spot] = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Successfully booked spot $spot')),
+        );
+      }
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BookingConfirmationPage(
+            userName: widget.userName,
+            vehicleType: widget.vehicleType,
+            slotNumber: spot,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to book spot $spot: $e')),
+        );
+      }
+    }
   }
 
   @override

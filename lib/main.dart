@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:parking/config/parking_repository.dart';
 import 'widgets/parkingfloor.dart';
 import 'widgets/UserForm.dart';
-void main() {
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'config/supabase_config.dart';
+import 'config/parking_state.dart';
+import 'config/parking_repository.dart';
+import 'config/shared_prefs.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
+  await SupabaseConfig.initializeSupabase();
+  print(await UserData.getUserName());
+  print(await UserData.getVehicleType());
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Tnp Parks',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -37,8 +48,13 @@ class MyApp extends StatelessWidget {
 }
 
 class MyBookPage extends StatefulWidget {
-  const MyBookPage({super.key, required this.selectedVehicle});
+  const MyBookPage({
+    super.key,
+    required this.selectedVehicle,
+    required this.userName,
+  });
   final String selectedVehicle;
+  final String userName;
 
   @override
   State<MyBookPage> createState() => _MyBookPageState();
@@ -46,6 +62,30 @@ class MyBookPage extends StatefulWidget {
 
 class _MyBookPageState extends State<MyBookPage> {
   final int bikeSpaces = 9;
+  late Map<int, bool> firstbikeSlots;
+  late Map<int, bool> firstcarSlots;
+  bool isLoading = true;
+
+  final ParkingRepository _parkingRepository = ParkingRepository();
+  Future<void> fetchParkingState() async {
+    ParkingState parkingState = await _parkingRepository
+        .getOccupiedSpotsToday();
+    print("fetched data");
+
+    setState(() {
+      firstbikeSlots = parkingState.bikeSlots;
+      firstcarSlots = parkingState.carSlots;
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchParkingState();
+  }
+
   final List<int> bikeParkingSpaces = [
     320,
     355,
@@ -103,6 +143,10 @@ class _MyBookPageState extends State<MyBookPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading || firstbikeSlots == null || firstcarSlots == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.selectedVehicle)),
       body: Center(
@@ -114,14 +158,20 @@ class _MyBookPageState extends State<MyBookPage> {
               children: [
                 ParkingFloor(
                   floorName: "First Floor",
-                  vehicleType: "Bike",
-                  parkingState: firstBikeParkingState,
+                  vehicleType: widget.selectedVehicle,
+                  userName: widget.userName,
+                  parkingState: widget.selectedVehicle == "Bike"
+                      ? firstbikeSlots
+                      : firstcarSlots,
                 ),
                 SizedBox(height: 20),
                 ParkingFloor(
                   floorName: "Second Floor",
-                  vehicleType: "Bike",
-                  parkingState: secondBikeParkingState,
+                  vehicleType: widget.selectedVehicle,
+                  userName: widget.userName,
+                  parkingState: widget.selectedVehicle == "Bike"
+                      ? secondBikeParkingState
+                      : secondCarParkingState,
                 ),
               ],
             ),
@@ -151,9 +201,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _selectedVehicle = "Car";
   String name = "";
-  int _counter = 0;
 
   void _incrementCounter() {
     setState(() {
@@ -162,7 +210,6 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _counter++;
     });
   }
 
@@ -202,15 +249,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // action in the IDE, or press "p" in the console), to see the
           // wireframe for each widget.
           mainAxisAlignment: .center,
-          children: [
-            const UserForm(),
-
-
-
-
-            const SizedBox(height: 30),
-
-          ],
+          children: [const UserForm(), const SizedBox(height: 30)],
         ),
       ),
 
