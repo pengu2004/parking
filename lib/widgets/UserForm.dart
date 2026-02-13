@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:parking/database.dart';
-import 'package:parking/main.dart';
 import 'package:parking/widgets/bookingConfirm.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config/shared_prefs.dart';
 import '../config/parking_repository.dart';
+import '../main.dart';
 
 class UserForm extends StatefulWidget {
   const UserForm({Key? key}) : super(key: key);
@@ -14,43 +12,6 @@ class UserForm extends StatefulWidget {
 }
 
 class _UserFormState extends State<UserForm> {
-  Future<void> _checkSavedUser() async {
-    final String? savedName = await UserData.getUserName();
-    final String? savedVehicle = await UserData.getVehicleType();
-    final ParkingRepository _parkingRepository = ParkingRepository();
-    final int? userSlot = await _parkingRepository.hasUserBookedToday(
-      name: savedName ?? '',
-    );
-    print("Saved name: $savedName, vehicle: $savedVehicle");
-    setState(() {
-      _nameController.text = savedName ?? '';
-      _selectedVehicle = savedVehicle;
-    });
-    if (!mounted) return;
-    if (userSlot != null && savedVehicle != null && savedName != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BookingConfirmationPage(
-            slotNumber: userSlot,
-            vehicleType: savedVehicle,
-            userName: savedName,
-          ),
-        ),
-      );
-      return;
-    }
-    if (savedName != null && savedVehicle != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              MyBookPage(selectedVehicle: savedVehicle, userName: savedName),
-        ),
-      );
-    }
-  }
-
   final TextEditingController _nameController = TextEditingController();
   final List<String> _vehicleTypes = ['Car', 'Bike'];
   String? _selectedVehicle;
@@ -62,6 +23,46 @@ class _UserFormState extends State<UserForm> {
     _checkSavedUser();
   }
 
+  Future<void> _checkSavedUser() async {
+    final savedName = await UserData.getUserName();
+    final savedVehicle = await UserData.getVehicleType();
+
+    if (savedName == null || savedVehicle == null) return;
+
+    final parkingRepository = ParkingRepository();
+    final userSlot =
+        await parkingRepository.hasUserBookedToday(name: savedName);
+
+    if (!mounted) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (userSlot != null) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BookingConfirmationPage(
+              slotNumber: userSlot,
+              vehicleType: savedVehicle,
+              userName: savedName,
+            ),
+          ),
+          (route) => false,
+        );
+      } else {
+        // User saved but not booked → go to booking page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => MyBookPage(
+              selectedVehicle: savedVehicle,
+              userName: savedName,
+            ),
+          ),
+        );
+      }
+    });
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -69,75 +70,112 @@ class _UserFormState extends State<UserForm> {
   }
 
   Future<void> submitForm() async {
-    await DatabaseHelper.insertUser(_nameController.text, _selectedVehicle!);
-    _nameController.clear();
-    setState(() => _selectedVehicle = _vehicleTypes[0]);
-  }
+    final name = _nameController.text.trim();
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your name')),
+      );
+      return;
+    }
 
-        children: [
-          TextField(
-            controller: _nameController,
-            decoration: const InputDecoration(labelText: 'Name'),
-          ),
-          const SizedBox(height: 16),
-          DropdownButtonFormField(
-            decoration: const InputDecoration(
-              labelText: 'Vehicle Type',
-              border: OutlineInputBorder(),
-            ),
-            initialValue: _selectedVehicle,
-            items: _vehicleTypes.map((vehicle) {
-              return DropdownMenuItem(value: vehicle, child: Text(vehicle));
-            }).toList(),
-            onChanged: (value) {
-              print(value);
-              setState(() {
-                _selectedVehicle = value!;
-              });
-            },
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              // Sets a fixed width of 200 and height of 50
-              fixedSize: const Size(200, 50),
-              // Or set minimum size to allow growth but ensure a base size
-              // minimumSize: const Size(100, 40),
-            ),
-            onPressed: () async {
-              print("clicked");
-              final name = _nameController.text.trim();
+    await UserData.saveUserData(name, _selectedVehicle!);
 
-              if (name.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please enter your name')),
-                );
-                return;
-              }
+    if (!mounted) return;
 
-              await UserData.saveUserData(name, _selectedVehicle!);
-              print("Saved to prefs");
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MyBookPage(
-                    selectedVehicle: _selectedVehicle!,
-                    userName: _nameController.text,
-                  ),
-                ),
-              );
-            },
-            child: const Text("Book"),
-          ),
-        ],
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MyBookPage(
+          selectedVehicle: _selectedVehicle!,
+          userName: name,
+        ),
       ),
     );
   }
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.grey[100],
+    body: Center(
+      child: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Card(
+            elevation: 8,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Center(
+                    child: Text(
+                      "Book Parking Slot",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+
+                  TextField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Name',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      labelText: 'Vehicle Type',
+                      border: OutlineInputBorder(),
+                    ),
+                    value: _selectedVehicle,
+                    items: _vehicleTypes.map((vehicle) {
+                      return DropdownMenuItem(
+                        value: vehicle,
+                        child: Text(vehicle),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedVehicle = value!;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 30),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: submitForm,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        "Book",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
 }

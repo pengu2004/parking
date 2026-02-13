@@ -7,10 +7,13 @@ import 'config/supabase_config.dart';
 import 'config/parking_state.dart';
 import 'config/parking_repository.dart';
 import 'config/shared_prefs.dart';
+import 'widgets/bookingConfirm.dart';
+import 'widgets/splashScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load();
+  await dotenv.load(fileName: ".env");
+
   await SupabaseConfig.initializeSupabase();
   print(await UserData.getUserName());
   print(await UserData.getVehicleType());
@@ -42,7 +45,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.green[400]!),
       ),
-      home: const MyHomePage(title: 'TNP Parks'),
+      home: const SplashScreen(),
     );
   }
 }
@@ -68,9 +71,11 @@ class _MyBookPageState extends State<MyBookPage> {
 
   final ParkingRepository _parkingRepository = ParkingRepository();
   Future<void> fetchParkingState() async {
+    
     ParkingState parkingState = await _parkingRepository
         .getOccupiedSpotsToday();
-    print("fetched data");
+
+
 
     setState(() {
       firstbikeSlots = parkingState.bikeSlots;

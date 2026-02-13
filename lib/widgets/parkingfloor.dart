@@ -45,7 +45,7 @@ class _ParkingFloorState extends State<ParkingFloor> {
           SnackBar(content: Text('Successfully booked spot $spot')),
         );
       }
-      Navigator.push(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
           builder: (context) => BookingConfirmationPage(
@@ -54,6 +54,8 @@ class _ParkingFloorState extends State<ParkingFloor> {
             slotNumber: spot,
           ),
         ),
+        (route) => false,
+
       );
     } catch (e) {
       if (mounted) {

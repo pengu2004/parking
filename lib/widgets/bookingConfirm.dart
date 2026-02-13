@@ -18,11 +18,7 @@ class BookingConfirmationPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Booking Confirmed'),
         backgroundColor: Colors.green[400],
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () =>
-              Navigator.of(context).popUntil((route) => route.isFirst),
-        ),
+  
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -85,40 +81,6 @@ class BookingConfirmationPage extends StatelessWidget {
             const SizedBox(height: 30),
 
             // Action Buttons
-            Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.of(
-                      context,
-                    ).popUntil((route) => route.isFirst),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green[400],
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                    ),
-                    child: const Text(
-                      'Back to Home',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                    ),
-                    child: const Text(
-                      'Book Another Slot',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),
