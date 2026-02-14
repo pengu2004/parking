@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:parking/widgets/AvailScreen.dart';
+import 'package:parking/widgets/BookPage.dart';
 import '../config/shared_prefs.dart';
 import '../config/parking_repository.dart';
 import '../main.dart';
 import 'bookingConfirm.dart';
 import 'UserForm.dart';
 import 'LoginForm.dart';
+import 'AvailScreen.dart';
 
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
@@ -28,6 +31,13 @@ class _LoginscreenState extends State<Loginscreen> {
       });
     });
     _checkSavedUser();
+  }
+
+  void navigateToUserForm() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AvailabilityScreen()),
+    );
   }
 
   Future<void> _checkSavedUser() async {
@@ -70,7 +80,10 @@ class _LoginscreenState extends State<Loginscreen> {
   }
 
   void _navigateToUserForm() {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => Loginform()));
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AvailabilityScreen()),
+    );
   }
 
   @override
@@ -166,6 +179,7 @@ class _LoginscreenState extends State<Loginscreen> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           print("Valid email: ${_emailController.text}");
+                          navigateToUserForm();
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -184,6 +198,7 @@ class _LoginscreenState extends State<Loginscreen> {
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ),
+                    const SizedBox(height: 10),
                   ],
                 ),
               ),
