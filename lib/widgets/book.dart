@@ -80,12 +80,14 @@ class _MyBookPageState extends State<MyBookPage> {
                 ParkingFloor(
                   floorName: "First Floor",
                   vehicleType: "Bike",
+                  userName: "User",
                   parkingState: firstBikeParkingState,
                 ),
                 SizedBox(height: 20),
                 ParkingFloor(
                   floorName: "Second Floor",
                   vehicleType: "Bike",
+                  userName: "User",
                   parkingState: secondBikeParkingState,
                 ),
               ],
