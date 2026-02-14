@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
-class FloorSelector extends StatefulWidget {
-  @override
-  _FloorSelectorState createState() => _FloorSelectorState();
-}
+class FloorSelector extends StatelessWidget {
+  final List<String> floors;
+  final int selectedIndex;
+  final Function(int) onFloorSelected;
 
-class _FloorSelectorState extends State<FloorSelector> {
-  int selectedIndex = 0;
-
-  final floors = ["1st Floor", "2nd Floor"];
+  const FloorSelector({
+    super.key,
+    required this.floors,
+    required this.selectedIndex,
+    required this.onFloorSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +26,7 @@ class _FloorSelectorState extends State<FloorSelector> {
           final isSelected = selectedIndex == index;
 
           return GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedIndex = index;
-              });
-            },
+            onTap: () => onFloorSelected(index),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),

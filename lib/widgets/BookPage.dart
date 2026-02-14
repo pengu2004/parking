@@ -10,19 +10,21 @@ class MyBookPage extends StatefulWidget {
     super.key,
     required this.selectedVehicle,
     required this.userName,
+    required this.floors,
   });
   final String selectedVehicle;
   final String userName;
+  final List<String> floors;
 
   @override
   State<MyBookPage> createState() => _MyBookPageState();
 }
 
 class _MyBookPageState extends State<MyBookPage> {
-  final int bikeSpaces = 9;
   late Map<int, bool> firstbikeSlots;
   late Map<int, bool> firstcarSlots;
   bool isLoading = true;
+  int _selectedFloorIndex = 0;
 
   final ParkingRepository _parkingRepository = ParkingRepository();
   Future<void> fetchParkingState() async {
@@ -43,61 +45,6 @@ class _MyBookPageState extends State<MyBookPage> {
     fetchParkingState();
   }
 
-  final List<int> bikeParkingSpaces = [
-    320,
-    355,
-    358,
-    362,
-    363,
-    364,
-    365,
-    366,
-    377,
-  ];
-  final Map<int, bool> firstBikeParkingState = {
-    300: true,
-    301: false,
-    302: true,
-    304: true,
-    305: false,
-    306: false,
-    307: false,
-    308: true,
-    311: true,
-  };
-  final Map<int, bool> secondBikeParkingState = {
-    300: true,
-    301: false,
-    302: true,
-    304: true,
-    305: false,
-    306: false,
-    3007: false,
-    308: true,
-  };
-  final Map<int, bool> firstCarParkingState = {
-    300: true,
-    301: false,
-    302: true,
-    304: true,
-    305: false,
-    306: false,
-    307: false,
-    308: true,
-    311: true,
-  };
-  final Map<int, bool> secondCarParkingState = {
-    300: true,
-    301: false,
-    302: true,
-    304: true,
-    305: false,
-    306: false,
-    307: false,
-    308: true,
-    311: true,
-  };
-
   @override
   Widget build(BuildContext context) {
     if (isLoading || firstbikeSlots == null || firstcarSlots == null) {
@@ -114,10 +61,18 @@ class _MyBookPageState extends State<MyBookPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 FloorSelector(
+                  floors: ["1st Floor", "2nd Floor", "3rd Floor"],
+                  selectedIndex: _selectedFloorIndex,
+                  onFloorSelected: (index) {
+                    setState(() {
+                      _selectedFloorIndex = index;
+                    });
+                  },
+
                   // Handle floor selection if needed
                 ),
                 ParkingFloor(
-                  floorName: "First Floor",
+                  floorName: widget.floors[_selectedFloorIndex],
                   vehicleType: widget.selectedVehicle,
                   userName: widget.userName,
                   parkingState: widget.selectedVehicle == "Bike"
@@ -125,14 +80,6 @@ class _MyBookPageState extends State<MyBookPage> {
                       : firstcarSlots,
                 ),
                 SizedBox(height: 20),
-                ParkingFloor(
-                  floorName: "Second Floor",
-                  vehicleType: widget.selectedVehicle,
-                  userName: widget.userName,
-                  parkingState: widget.selectedVehicle == "Bike"
-                      ? secondBikeParkingState
-                      : secondCarParkingState,
-                ),
               ],
             ),
           ),

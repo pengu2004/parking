@@ -45,8 +45,11 @@ class AvailabilityScreen extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) =>
-                MyBookPage(selectedVehicle: vehicle, userName: "Tejus"),
+            builder: (_) => MyBookPage(
+              selectedVehicle: vehicle,
+              userName: "Tejus",
+              floors: ["1st Floor", "2nd Floor","3rd Floor"],
+            ),
           ),
         );
       },

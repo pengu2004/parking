@@ -72,7 +72,7 @@ class _LoginscreenState extends State<Loginscreen> {
           context,
           MaterialPageRoute(
             builder: (_) =>
-                MyBookPage(selectedVehicle: savedVehicle, userName: savedName),
+                MyBookPage(selectedVehicle: savedVehicle, userName: savedName, floors: ["1st Floor", "2nd Floor", "3rd Floor"]),
           ),
         );
       }

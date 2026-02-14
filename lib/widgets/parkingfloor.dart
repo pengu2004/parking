@@ -75,7 +75,6 @@ class _ParkingFloorState extends State<ParkingFloor> {
         const SizedBox(height: 20),
         GridView.count(
           shrinkWrap: true,
-
           crossAxisCount: 3,
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,

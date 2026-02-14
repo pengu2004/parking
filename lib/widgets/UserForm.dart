@@ -57,6 +57,7 @@ class _UserFormState extends State<UserForm> {
             builder: (_) => MyBookPage(
               selectedVehicle: savedVehicle,
               userName: savedName,
+              floors: ["1st Floor", "2nd Floor", "3rd Floor"],
             ),
           ),
         );
@@ -90,6 +91,7 @@ class _UserFormState extends State<UserForm> {
         builder: (_) => MyBookPage(
           selectedVehicle: _selectedVehicle!,
           userName: name,
+          floors: ["1st Floor", "2nd Floor", "3rd Floor"],
         ),
       ),
     );
