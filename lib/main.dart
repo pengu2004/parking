@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.green[400]!),
       ),
-      home:  Loginscreen(),
+      home:  SplashScreen(),
     );
   }
 }

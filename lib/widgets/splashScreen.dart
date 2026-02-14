@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:parking/widgets/AvailScreen.dart';
 import 'package:parking/widgets/bookingConfirm.dart';
 import 'package:parking/widgets/UserForm.dart'; // adjust if filename differs
 import 'package:parking/main.dart';
@@ -48,25 +50,21 @@ class _SplashScreenState extends State<SplashScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) =>
-              MyBookPage(tower:"a", selectedVehicle: savedVehicle, userName: savedName, floors: ["1st Floor", "2nd Floor", "3rd Floor"]),
-        ),
+        MaterialPageRoute(builder: (_) => AvailabilityScreen()),
       );
       return;
     }
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const UserForm()),
+      MaterialPageRoute(builder: (_) => AvailabilityScreen()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Dashboard")),
-      body: Center(child: CircularProgressIndicator()),
+      body: Center(child: SvgPicture.asset('assets/TNPLogo.svg', width: 150)),
     );
   }
 }
