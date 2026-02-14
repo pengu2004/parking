@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:parking/config/parking_repository.dart';
+import 'package:parking/widgets/LoginScreen.dart';
 import 'widgets/parkingfloor.dart';
 import 'widgets/UserForm.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -12,7 +13,12 @@ import 'widgets/splashScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+  // Try to load .env file, but don't fail if it doesn't exist (for web deployment)
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    print("Could not load .env file: $e");
+  }
 
   await SupabaseConfig.initializeSupabase();
   print(await UserData.getUserName());
@@ -45,7 +51,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.green[400]!),
       ),
-      home: const SplashScreen(),
+      home:  Loginscreen(),
     );
   }
 }
@@ -71,11 +77,8 @@ class _MyBookPageState extends State<MyBookPage> {
 
   final ParkingRepository _parkingRepository = ParkingRepository();
   Future<void> fetchParkingState() async {
-    
     ParkingState parkingState = await _parkingRepository
         .getOccupiedSpotsToday();
-
-
 
     setState(() {
       firstbikeSlots = parkingState.bikeSlots;

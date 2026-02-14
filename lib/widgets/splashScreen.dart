@@ -5,8 +5,6 @@ import 'package:parking/main.dart';
 import '../config/shared_prefs.dart';
 import '../config/parking_repository.dart';
 
-
-
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -27,8 +25,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (savedName != null && savedVehicle != null) {
       final parkingRepository = ParkingRepository();
-      final userSlot =
-          await parkingRepository.hasUserBookedToday(name: savedName);
+      final userSlot = await parkingRepository.hasUserBookedToday(
+        name: savedName,
+      );
 
       if (!mounted) return;
 
@@ -49,10 +48,8 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => MyBookPage(
-            selectedVehicle: savedVehicle,
-            userName: savedName,
-          ),
+          builder: (_) =>
+              MyBookPage(selectedVehicle: savedVehicle, userName: savedName),
         ),
       );
       return;
@@ -60,15 +57,14 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (_) => const UserForm(),
-      ),
+      MaterialPageRoute(builder: (_) => const UserForm()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      appBar: AppBar(title: Text("Dashboard")),
       body: Center(child: CircularProgressIndicator()),
     );
   }
