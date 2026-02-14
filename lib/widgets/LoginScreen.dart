@@ -102,7 +102,7 @@ class _LoginscreenState extends State<Loginscreen> {
                     scale: _scale,
                     duration: const Duration(milliseconds: 800),
                     curve: Curves.easeOut,
-                    child: SvgPicture.asset('assets/TNPLogo.svg', width: 170),
+                    child: SvgPicture.asset('TNPLogo.svg', width: 170),
                   ),
                   const SizedBox(height: 20),
                   const Text(
