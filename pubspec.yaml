@@ -72,7 +72,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    -  assets/.env
+    -  .env
     -  assets/SpaceGrotesk-Bold.ttf
     -  assets/TNPLogo.svg
 
