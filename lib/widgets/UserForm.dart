@@ -55,6 +55,7 @@ class _UserFormState extends State<UserForm> {
           context,
           MaterialPageRoute(
             builder: (_) => MyBookPage(
+              tower: "a",
               selectedVehicle: savedVehicle,
               userName: savedName,
               floors: ["1st Floor", "2nd Floor", "3rd Floor"],
@@ -88,7 +89,8 @@ class _UserFormState extends State<UserForm> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => MyBookPage(
+        builder: (_) => MyBookPage
+        (tower: "a",
           selectedVehicle: _selectedVehicle!,
           userName: name,
           floors: ["1st Floor", "2nd Floor", "3rd Floor"],

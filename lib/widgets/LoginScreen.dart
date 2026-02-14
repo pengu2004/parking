@@ -42,9 +42,8 @@ class _LoginscreenState extends State<Loginscreen> {
 
   Future<void> _checkSavedUser() async {
     final savedName = await UserData.getUserName();
-    final savedVehicle = await UserData.getVehicleType();
 
-    if (savedName == null || savedVehicle == null) return;
+    if (savedName == null ) return;
 
     final parkingRepository = ParkingRepository();
     final userSlot = await parkingRepository.hasUserBookedToday(
@@ -60,8 +59,9 @@ class _LoginscreenState extends State<Loginscreen> {
           MaterialPageRoute(
             builder: (_) => BookingConfirmationPage(
               slotNumber: userSlot,
-              vehicleType: savedVehicle,
+              vehicleType: "Car",
               userName: savedName,
+              
             ),
           ),
           (route) => false,
@@ -71,8 +71,7 @@ class _LoginscreenState extends State<Loginscreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) =>
-                MyBookPage(selectedVehicle: savedVehicle, userName: savedName, floors: ["1st Floor", "2nd Floor", "3rd Floor"]),
+            builder: (_) => AvailabilityScreen(),
           ),
         );
       }
@@ -179,6 +178,10 @@ class _LoginscreenState extends State<Loginscreen> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           print("Valid email: ${_emailController.text}");
+                          UserData.saveUserData(
+                            _emailController.text.split("@").first,
+                            "",
+                          );
                           navigateToUserForm();
                         }
                       },

@@ -7,10 +7,12 @@ class ParkingFloor extends StatefulWidget {
   final String vehicleType;
   final Map<int, bool> parkingState;
   final String userName;
+  final String tower;
 
   const ParkingFloor({
     super.key,
     required this.floorName,
+    required this.tower,
     required this.vehicleType,
     required this.parkingState,
     required this.userName,
@@ -26,7 +28,6 @@ class _ParkingFloorState extends State<ParkingFloor> {
   @override
   void initState() {
     super.initState();
-    spots = Map.from(widget.parkingState);
   }
 
   void bookSpot(int spot) async {
@@ -55,7 +56,6 @@ class _ParkingFloorState extends State<ParkingFloor> {
           ),
         ),
         (route) => false,
-
       );
     } catch (e) {
       if (mounted) {
@@ -72,6 +72,8 @@ class _ParkingFloorState extends State<ParkingFloor> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(widget.floorName, style: const TextStyle(fontSize: 18)),
+        Text(widget.tower, style: const TextStyle(fontSize: 18)),
+
         const SizedBox(height: 20),
         GridView.count(
           shrinkWrap: true,
@@ -79,8 +81,8 @@ class _ParkingFloorState extends State<ParkingFloor> {
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,
           physics: const NeverScrollableScrollPhysics(),
-          children: spots.keys.map((spot) {
-            final isAvailable = spots[spot]!;
+          children: widget.parkingState.keys.map((spot) {
+            final isAvailable = widget.parkingState[spot] ?? false;
 
             return InkWell(
               onTap: isAvailable

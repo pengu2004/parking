@@ -50,7 +50,7 @@ class _SplashScreenState extends State<SplashScreen> {
         context,
         MaterialPageRoute(
           builder: (_) =>
-              MyBookPage(selectedVehicle: savedVehicle, userName: savedName, floors: ["1st Floor", "2nd Floor", "3rd Floor"]),
+              MyBookPage(tower:"a", selectedVehicle: savedVehicle, userName: savedName, floors: ["1st Floor", "2nd Floor", "3rd Floor"]),
         ),
       );
       return;

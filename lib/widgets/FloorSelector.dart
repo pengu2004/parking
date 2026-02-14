@@ -26,7 +26,11 @@ class FloorSelector extends StatelessWidget {
           final isSelected = selectedIndex == index;
 
           return GestureDetector(
-            onTap: () => onFloorSelected(index),
+            onTap: () => {
+              onFloorSelected(index),
+              print("Selected floor: ${floors[index]}"),
+              print(index)
+            },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),

@@ -1,8 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:parking/config/parking_repository.dart';
 import 'BookPage.dart';
+import '../config/parking_state.dart';
 
-class AvailabilityScreen extends StatelessWidget {
-  const AvailabilityScreen({super.key});
+class AvailabilityScreen extends StatefulWidget {
+  final ParkingRepository _parkingRepository = ParkingRepository();
+  @override
+  State<AvailabilityScreen> createState() => _AvailabilityScreenState();
+
+  AvailabilityScreen({super.key});
+}
+
+class _AvailabilityScreenState extends State<AvailabilityScreen> {
+  final ParkingRepository _parkingRepository = ParkingRepository();
+  final firstTowerBikeSlots = Map<int, bool>();
+  final secondTowerBikeSlots = Map<int, bool>();
+  final firstTowerCarSlots = Map<int, bool>();
+
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAvailability();
+  }
+
+  Future<void> _fetchAvailability() async {
+    ParkingState AvailabilityToday = await _parkingRepository
+        .getOccupiedSpotsToday();
+    setState(() {
+      isLoading = false;
+      firstTowerBikeSlots.addAll(AvailabilityToday.bikeSlotsTower1);
+      secondTowerBikeSlots.addAll(AvailabilityToday.bikeSlotsTower2);
+      firstTowerCarSlots.addAll(AvailabilityToday.carSlots);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,23 +46,25 @@ class AvailabilityScreen extends StatelessWidget {
         elevation: 0,
       ),
 
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF7EFB99), Color(0xFFEFFBF1), Colors.white],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF7EFB99), Color(0xFFEFFBF1), Colors.white],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
 
-        child: PageView(
-          children: [
-            _buildTowerScreen(context, "Bike", "Tower-2", 2),
-            _buildTowerScreen(context, "Car", "Tower-2", 3),
-            _buildTowerScreen(context, "Bike", "Tower-1", 8),
-          ],
-        ),
-      ),
+              child: PageView(
+                children: [
+                  _buildTowerScreen(context, "Bike", "Tower-2", secondTowerBikeSlots.length),
+                  _buildTowerScreen(context, "Car", "Tower-2", firstTowerCarSlots.length),
+                  _buildTowerScreen(context, "Bike", "Tower-1", firstTowerBikeSlots.length),
+                ],
+              ),
+            ),
     );
   }
 
@@ -46,9 +80,10 @@ class AvailabilityScreen extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (_) => MyBookPage(
+              tower: tower,
               selectedVehicle: vehicle,
               userName: "Tejus",
-              floors: ["1st Floor", "2nd Floor","3rd Floor"],
+              floors: ["1st Floor", "2nd Floor"],
             ),
           ),
         );
