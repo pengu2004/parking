@@ -28,6 +28,7 @@ class _ParkingFloorState extends State<ParkingFloor> {
   @override
   void initState() {
     super.initState();
+    spots = widget.parkingState;
   }
 
   void bookSpot(int spot) async {
@@ -71,15 +72,12 @@ class _ParkingFloorState extends State<ParkingFloor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.floorName, style: const TextStyle(fontSize: 18)),
-        Text(widget.tower, style: const TextStyle(fontSize: 18)),
-
         const SizedBox(height: 20),
         GridView.count(
           shrinkWrap: true,
-          crossAxisCount: 3,
-          mainAxisSpacing: 10,
+          crossAxisCount: 2,
           crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
           physics: const NeverScrollableScrollPhysics(),
           children: widget.parkingState.keys.map((spot) {
             final isAvailable = widget.parkingState[spot] ?? false;
@@ -109,12 +107,48 @@ class _ParkingFloorState extends State<ParkingFloor> {
                   : null,
 
               child: Ink(
-                color: isAvailable ? Colors.green[100] : Colors.grey,
-                child: Center(
-                  child: Text(
-                    '$spot',
-                    style: const TextStyle(color: Colors.black, fontSize: 20),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: isAvailable ? Colors.green : Colors.grey,
+                    width: 2,
                   ),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isAvailable
+                          ? Colors.green.withOpacity(0.5)
+                          : Colors.grey.withOpacity(0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (!isAvailable)
+                      Image.asset(
+                        widget.vehicleType == "Car"
+                            ? "Car-top.png"
+                            : "Bike-top.png",
+                        width: 150,
+                      ),
+
+                    Text(
+                      "$spot",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      isAvailable ? "Available" : "Occupied",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: isAvailable ? Colors.black : Colors.red,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );

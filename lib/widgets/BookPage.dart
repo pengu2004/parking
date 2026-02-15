@@ -78,43 +78,41 @@ class _MyBookPageState extends State<MyBookPage> {
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.selectedVehicle)),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FloorSelector(
-                  floors: widget.floors,
-                  selectedIndex: _selectedFloorIndex,
-                  onFloorSelected: (index) {
-                    setState(() {
-                      _selectedFloorIndex = index;
-                    });
-                  },
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FloorSelector(
+                floors: widget.floors,
+                selectedIndex: _selectedFloorIndex,
+                onFloorSelected: (index) {
+                  setState(() {
+                    _selectedFloorIndex = index;
+                  });
+                },
 
-                  // Handle floor selection if needed
-                ),
-                ParkingFloor(
-                  tower: widget.tower,
-                  floorName: widget.floors[_selectedFloorIndex],
-                  vehicleType: widget.selectedVehicle,
-                  userName: widget.userName,
-                  parkingState: widget.selectedVehicle == "Bike"
-                      ? (widget.tower == "Tower-1"
-                            ? firstbikeSlotsTower1
-                            : firstbikeSlotsTower2)
-                      : (_selectedFloorIndex == 0
-                            ? firstcarSlot
-                            : secondcarSlot), // Pass the correct car slots based on floor and tower
-                ),
-                SizedBox(height: 20),
-              ],
-            ),
+                // Handle floor selection if needed
+              ),
+              ParkingFloor(
+                tower: widget.tower,
+                floorName: widget.floors[_selectedFloorIndex],
+                vehicleType: widget.selectedVehicle,
+                userName: widget.userName,
+                parkingState: widget.selectedVehicle == "Bike"
+                    ? (widget.tower == "Tower-1"
+                          ? firstbikeSlotsTower1
+                          : firstbikeSlotsTower2)
+                    : (_selectedFloorIndex == 0
+                          ? firstcarSlot
+                          : secondcarSlot), // Pass the correct car slots based on floor and tower
+              ),
+              SizedBox(height: 20),
+            ],
           ),
         ),
-      ),
+    ),
     );
   }
 }

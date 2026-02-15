@@ -17,7 +17,6 @@ class FloorSelector extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: Colors.green.shade200,
         borderRadius: BorderRadius.circular(30),
       ),
       child: Row(

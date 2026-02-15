@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:parking/widgets/AvailScreen.dart';
+import 'package:parking/widgets/LoginScreen.dart';
 import 'package:parking/widgets/bookingConfirm.dart';
 import 'package:parking/widgets/UserForm.dart'; // adjust if filename differs
 import 'package:parking/main.dart';
@@ -25,12 +26,21 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _initialize() async {
     final savedName = await UserData.getUserName();
     final savedVehicle = await UserData.getVehicleType();
+    if (savedName == null || savedVehicle == null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => Loginscreen()),
+      );
+      return;
+    }
 
     if (savedName != null && savedVehicle != null) {
       final parkingRepository = ParkingRepository();
       final userSlot = await parkingRepository.hasUserBookedToday(
         name: savedName,
       );
+      print("userslot" + userSlot.toString());
+      print(savedName);
 
       if (!mounted) return;
 
@@ -50,14 +60,18 @@ class _SplashScreenState extends State<SplashScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => AvailabilityScreen()),
+        MaterialPageRoute(
+          builder: (_) => AvailabilityScreen(userName: savedName),
+        ),
       );
       return;
     }
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => AvailabilityScreen()),
+      MaterialPageRoute(
+        builder: (_) => AvailabilityScreen(userName: savedName),
+      ),
     );
   }
 

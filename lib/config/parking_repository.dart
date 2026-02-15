@@ -50,11 +50,10 @@ class ParkingRepository {
 
     final response = await _client
         .from('parking_records')
-        .select('slot_number, vehicle_type')
+        .select('slot_number')
         .eq('name', name)
         .eq('date', dateOnly)
         .limit(1);
-
     if (response.isEmpty) {
       return null; //
     }

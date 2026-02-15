@@ -4,11 +4,10 @@ import 'BookPage.dart';
 import '../config/parking_state.dart';
 
 class AvailabilityScreen extends StatefulWidget {
-  final ParkingRepository _parkingRepository = ParkingRepository();
   @override
   State<AvailabilityScreen> createState() => _AvailabilityScreenState();
-
-  AvailabilityScreen({super.key});
+  AvailabilityScreen({super.key, required this.userName});
+  final String userName;
 }
 
 class _AvailabilityScreenState extends State<AvailabilityScreen> {
@@ -59,9 +58,24 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
 
               child: PageView(
                 children: [
-                  _buildTowerScreen(context, "Bike", "Tower-2", secondTowerBikeSlots.length),
-                  _buildTowerScreen(context, "Car", "Tower-2", firstTowerCarSlots.length),
-                  _buildTowerScreen(context, "Bike", "Tower-1", firstTowerBikeSlots.length),
+                  _buildTowerScreen(
+                    context,
+                    "Bike",
+                    "Tower-2",
+                    secondTowerBikeSlots.values.where((value) => value).length,
+                  ),
+                  _buildTowerScreen(
+                    context,
+                    "Car",
+                    "Tower-2",
+                    firstTowerCarSlots.values.where((value) => value).length,
+                  ),
+                  _buildTowerScreen(
+                    context,
+                    "Bike",
+                    "Tower-1",
+                    firstTowerBikeSlots.values.where((value) => value).length,
+                  ),
                 ],
               ),
             ),
@@ -82,8 +96,10 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
             builder: (_) => MyBookPage(
               tower: tower,
               selectedVehicle: vehicle,
-              userName: "Tejus",
-              floors: ["1st Floor", "2nd Floor"],
+              userName: widget.userName,
+              floors: (vehicle == "Bike"
+                  ? ["1st Floor"]
+                  : ["1st Floor", "7th Floor"]),
             ),
           ),
         );

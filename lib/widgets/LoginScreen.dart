@@ -33,17 +33,19 @@ class _LoginscreenState extends State<Loginscreen> {
     _checkSavedUser();
   }
 
-  void navigateToUserForm() {
+  void navigateToUserForm(String savedName) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => AvailabilityScreen()),
+      MaterialPageRoute(
+        builder: (_) => AvailabilityScreen(userName: savedName),
+      ),
     );
   }
 
   Future<void> _checkSavedUser() async {
     final savedName = await UserData.getUserName();
 
-    if (savedName == null ) return;
+    if (savedName == null) return;
 
     final parkingRepository = ParkingRepository();
     final userSlot = await parkingRepository.hasUserBookedToday(
@@ -61,7 +63,6 @@ class _LoginscreenState extends State<Loginscreen> {
               slotNumber: userSlot,
               vehicleType: "Car",
               userName: savedName,
-              
             ),
           ),
           (route) => false,
@@ -71,18 +72,11 @@ class _LoginscreenState extends State<Loginscreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => AvailabilityScreen(),
+            builder: (_) => AvailabilityScreen(userName: savedName),
           ),
         );
       }
     });
-  }
-
-  void _navigateToUserForm() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => AvailabilityScreen()),
-    );
   }
 
   @override
@@ -182,7 +176,9 @@ class _LoginscreenState extends State<Loginscreen> {
                             _emailController.text.split("@").first,
                             "",
                           );
-                          navigateToUserForm();
+                          navigateToUserForm(
+                            _emailController.text.split("@").first,
+                          );
                         }
                       },
                       style: ElevatedButton.styleFrom(
